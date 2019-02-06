@@ -1,0 +1,8 @@
+Content-Type application/json; UTF-8
+Authorization key=AAAA5HAHjLY:APA91bFlsxDDqoksqiG3tGVwYOhR16M5a0fUi25JwjPNoxRaSbTJy2XEoY61DcH7D3E_YMY8DYAwRYVTo_tC6wF5ecCcSUvUd7rADJCe8FWG-rdDbyc8m9xkq2gsQ-pn4-rGVvukaGaH
+{
+    "data": {
+        "testing": "no_value"
+     },
+    "registration_ids": ["f28YC-t6zqE:APA91bHSQlA2tjYOyxVZS7QMKYXGRTHpLF9vVPe_xLAsWSov1lCUxu8gh0ZiQBSPssYeXpKCDPdcASL_zv_FJbO55y4zx9AJEUkBilTHYOSdg8Przw5HQGVI1udDOL730ghEtnAd0v6c"]
+}
