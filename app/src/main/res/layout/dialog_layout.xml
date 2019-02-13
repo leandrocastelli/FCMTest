@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:orientation="vertical"
+    android:layout_margin="12dp">
+
+    <TextView
+        android:layout_margin="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Name:"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textStyle="bold"
+        />
+    <EditText
+        android:id="@+id/edtName"
+        android:layout_margin="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Your Name here"
+        android:padding="3dp"
+        android:background="@drawable/edit_text_background"/>
+
+    <TextView
+        android:layout_margin="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Email:"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textStyle="bold"
+        />
+    <EditText
+        android:id="@+id/edtOwnEmail"
+        android:layout_margin="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="youremail@gmail.com"
+        android:padding="3dp"
+        android:background="@drawable/edit_text_background"/>
+
+    <RadioGroup
+        android:id="@+id/rdGroupRole"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RadioButton
+            android:checked="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rbSon"
+            android:text="Son/Daughter"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:layout_weight="1"/>
+
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rbParent"
+            android:text="Parent"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:layout_weight="1"/>
+    </RadioGroup>
+    <TextView
+        android:layout_margin="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Parent Email:"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textStyle="bold"
+        />
+    <EditText
+        android:id="@+id/edtParentEmail"
+        android:layout_margin="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="parent@gmail.com"
+        android:padding="3dp"
+        android:background="@drawable/edit_text_background"/>
+
+</LinearLayout>
