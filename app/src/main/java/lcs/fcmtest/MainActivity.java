@@ -30,6 +30,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
+import java.util.HashMap;
+
 import lcs.fcmtest.database.DatabaseDAO;
 import lcs.fcmtest.model.Children;
 import lcs.fcmtest.model.Parent;
@@ -66,7 +68,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 MessageHandler handler = new MessageHandler();
-                handler.sendMessage(v.getContext(), "f28YC-t6zqE:APA91bHSQlA2tjYOyxVZS7QMKYXGRTHpLF9vVPe_xLAsWSov1lCUxu8gh0ZiQBSPssYeXpKCDPdcASL_zv_FJbO55y4zx9AJEUkBilTHYOSdg8Przw5HQGVI1udDOL730ghEtnAd0v6c");
+                //handler.sendMessage(v.getContext(), "f28YC-t6zqE:APA91bHSQlA2tjYOyxVZS7QMKYXGRTHpLF9vVPe_xLAsWSov1lCUxu8gh0ZiQBSPssYeXpKCDPdcASL_zv_FJbO55y4zx9AJEUkBilTHYOSdg8Przw5HQGVI1udDOL730ghEtnAd0v6c","1234", "Joao da Silva");
+                HashMap<String,String> map = new HashMap<String,String>();
+                map.put("notification_id","notification1");
+                map.put("sender_name","Testando");
+                handler.receiveMessage(v.getContext(), map);
             }
         });
     }

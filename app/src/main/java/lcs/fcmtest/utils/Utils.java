@@ -30,4 +30,10 @@ public class Utils {
         sharedPreferences.apply();
 
     }
+    public static String convertPackageNameToPath(String packageName) {
+        return packageName.replace('.','@');
+    }
+    public static String convertPathToPackageName(String path) {
+        return path.replace('@','.');
+    }
 }
