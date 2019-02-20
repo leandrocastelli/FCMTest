@@ -11,7 +11,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.List;
+
 import lcs.fcmtest.model.Children;
+import lcs.fcmtest.model.InfoAboutInstalledApps;
 import lcs.fcmtest.model.Person;
 import lcs.fcmtest.utils.Constants;
 import lcs.fcmtest.utils.Utils;
@@ -72,6 +75,48 @@ public class DatabaseDAO {
             }
         });
 
+    }
+
+    public void linkParentChild(Context context, String parent, String child) {
+        FirebaseApp.initializeApp(context);
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        database.getReference(Constants.PARENTS_DATABASE +
+                "/" + parent + "/childrens/" + child).setValue(true);
+        database.getReference(Constants.CHILDRENS_DATABASE +
+                "/" + child + "/parents/" + parent).setValue(true);
+    }
+
+    public void addAppList(Context context, String id, List<InfoAboutInstalledApps> list) {
+        FirebaseApp.initializeApp(context);
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        for (InfoAboutInstalledApps app : list) {
+            DatabaseReference reference = database.getReference(Constants.CHILDRENS_DATABASE +
+                    "/" + id + "/appList/" + Utils.convertPackageNameToPath(app.getPname()));
+            reference.setValue(app);
+        }
+
+    }
+
+    public void checkIfBlocked(Context context, String id, String packageName) {
+        FirebaseApp.initializeApp(context);
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference reference = database.getReference(Constants.CHILDRENS_DATABASE +
+                "/" + id + "/appList/" + Utils.convertPackageNameToPath(packageName));
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                InfoAboutInstalledApps value = dataSnapshot.getValue(InfoAboutInstalledApps.class);
+                if ("blocked".equals(value.getStatus())) {
+                    //App is blocked
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 }
