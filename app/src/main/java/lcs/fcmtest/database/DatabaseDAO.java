@@ -43,7 +43,7 @@ public class DatabaseDAO {
         if (person instanceof Children) {
             String parentId = ((Children)person).getParentEmail().split("@")[0];
             database.child(table).child(username).child(Constants.PARENTS_DATABASE)
-                    .child(parentId).setValue(true);
+                    .child(parentId).setValue(false);
         }
 
     }

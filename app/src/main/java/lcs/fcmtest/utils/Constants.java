@@ -14,6 +14,11 @@ public class Constants {
     public static final String TITLE = "title";
     public static final String URL = "https://fcm.googleapis.com/fcm/send";
 
+    public static final String NAME_DATA_KEY = "name";
+    public static final String EMAIL_DATA_KEY = "email";
+    public static final String AUTHORIZED_EMAIL_DATA_KEY = "authorized_email";
+
+
     public static String JSON_DATA ="{\n" +
             "    \"data\": {\n" +
             "        \"" + SENDER_ID + "\": \"%s\",\n" +

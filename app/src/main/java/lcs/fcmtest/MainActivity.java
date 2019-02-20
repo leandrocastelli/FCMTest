@@ -1,53 +1,86 @@
+/*
+ * Copyright 2013 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package lcs.fcmtest;
 
-import android.app.Dialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.DialogInterface;
-import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.Toast;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
-import java.util.HashMap;
+
+import java.util.List;
 
 import lcs.fcmtest.database.DatabaseDAO;
 import lcs.fcmtest.model.Children;
 import lcs.fcmtest.model.Parent;
 import lcs.fcmtest.model.Person;
-import lcs.fcmtest.notifications.MessageHandler;
+import lcs.fcmtest.utils.Constants;
 import lcs.fcmtest.utils.Utils;
+import lcs.fcmtest.wizard.models.AbstractWizardModel;
+import lcs.fcmtest.wizard.models.ModelCallbacks;
+import lcs.fcmtest.wizard.models.Page;
+import lcs.fcmtest.wizard.models.ReviewItem;
+import lcs.fcmtest.wizard.ui.PageFragmentCallbacks;
+import lcs.fcmtest.wizard.ui.ReviewFragment;
+import lcs.fcmtest.wizard.ui.StepPagerStrip;
 
+public class MainActivity extends FragmentActivity implements
+        PageFragmentCallbacks,
+        ReviewFragment.Callbacks,
+        ModelCallbacks {
+    private ViewPager mPager;
+    private MyPagerAdapter mPagerAdapter;
 
-public class MainActivity extends AppCompatActivity {
+    private boolean mEditingAfterReview;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    private AbstractWizardModel mWizardModel = new SandwichWizardModel(this);
+
+    private boolean mConsumePageSelectedEvent;
+
+    private Button mNextButton;
+    private Button mPrevButton;
+
+    private List<Page> mCurrentPageSequence;
+    private StepPagerStrip mStepPagerStrip;
+
+    private boolean isChildren=true;
+    private boolean isParent=false;
+
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //TODO REMOVE THIS - ONLY FOR DEVELOPMENT
-        //Utils.setRolePreference(this,"");
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                     @Override
@@ -63,88 +96,249 @@ public class MainActivity extends AppCompatActivity {
                         Utils.setTokenPreference(getApplication(), token);
                     }
                 });
-        Button button = findViewById(R.id.buttonSendMsg);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MessageHandler handler = new MessageHandler();
-                //handler.sendMessage(v.getContext(), "f28YC-t6zqE:APA91bHSQlA2tjYOyxVZS7QMKYXGRTHpLF9vVPe_xLAsWSov1lCUxu8gh0ZiQBSPssYeXpKCDPdcASL_zv_FJbO55y4zx9AJEUkBilTHYOSdg8Przw5HQGVI1udDOL730ghEtnAd0v6c","1234", "Joao da Silva");
-                HashMap<String,String> map = new HashMap<String,String>();
-                map.put("notification_id","notification1");
-                map.put("sender_name","Testando");
-                handler.receiveMessage(v.getContext(), map);
-            }
-        });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        String role = Utils.getRolePreference(this);
-        if (role.isEmpty()) {
-            createRoleDialog();
+        //if (!Utils.getRolePreference(this).equals(""))
+          //  return;
+        if (savedInstanceState != null) {
+            mWizardModel.load(savedInstanceState.getBundle("model"));
         }
-    }
 
+        mWizardModel.registerListener(this);
 
-    private void createRoleDialog() {
-        final  EditText edtName;
-        final  EditText ownEmail;
-        final  EditText parentEmail;
-        final RadioGroup rgRole;
-        final View view = LayoutInflater.from(this).inflate(R.layout.dialog_layout, null);
-
-        edtName = (EditText) view.findViewById(R.id.edtName);
-        ownEmail = (EditText)view.findViewById(R.id.edtOwnEmail);
-        parentEmail = (EditText)view.findViewById(R.id.edtParentEmail);
-        rgRole = (RadioGroup) view.findViewById(R.id.rdGroupRole);
-        rgRole.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        mPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.setAdapter(mPagerAdapter);
+        mStepPagerStrip = (StepPagerStrip) findViewById(R.id.strip);
+        mStepPagerStrip.setOnPageSelectedListener(new StepPagerStrip.OnPageSelectedListener() {
             @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.rbParent:
-                        parentEmail.getText().clear();
-                        parentEmail.setEnabled(false);
-
-
-                        break;
-                    case R.id.rbSon:
-                        parentEmail.setEnabled(true);
-
+            public void onPageStripSelected(int position) {
+                position = Math.min(mPagerAdapter.getCount() - 1, position);
+                if (mPager.getCurrentItem() != position) {
+                    mPager.setCurrentItem(position);
                 }
             }
         });
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setView(view)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String name = edtName.getText().toString();
-                        String email = ownEmail.getText().toString();
-                        String username = email.split("@")[0];
-                        String token = Utils.getTokenPreference(getApplicationContext());
-                        String role = "";
-                        Person person = null;
-                        switch (rgRole.getCheckedRadioButtonId()) {
-                            case R.id.rbParent:
-                                role = "parent";
-                                //Do the Parent thing here.
-                                person = new Parent(name,email,token,null);
-                            break;
-                            case R.id.rbSon:
-                                role = "children";
-                                //Do children stuff here
-                                String pEmail = parentEmail.getText().toString();
-                                person = new Children(name, email, token, pEmail);
-                            break;
-                        }
-                        DatabaseDAO.getInstance().savePerson(getApplicationContext(), person);
-                        Utils.setRolePreference(view.getContext(), role);
-                    }
-                });
-        builder.create().show();
 
+        mNextButton = (Button) findViewById(R.id.next_button);
+        mPrevButton = (Button) findViewById(R.id.prev_button);
+
+        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                mStepPagerStrip.setCurrentPage(position);
+
+                if (mConsumePageSelectedEvent) {
+                    mConsumePageSelectedEvent = false;
+                    return;
+                }
+
+                mEditingAfterReview = false;
+                updateBottomBar();
+            }
+        });
+
+        mNextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mPager.getCurrentItem() == mCurrentPageSequence.size()) {
+//                    DialogFragment dg = new DialogFragment() {
+//                        @Override
+//                        public Dialog onCreateDialog(Bundle savedInstanceState) {
+//                            return new AlertDialog.Builder(getActivity())
+//                                    .setMessage(R.string.submit_confirm_message)
+//                                    .setPositiveButton(R.string.submit_confirm_button, null)
+//                                    .setNegativeButton(android.R.string.cancel, null)
+//                                    .create();
+//                        }
+//                    };
+
+//                    dg.show(getSupportFragmentManager(), "place_order_dialog");
+                   // Intent i = new Intent(getApplicationContext(), BlockAppsActivity.class);
+                    //startActivity(i);
+                    Page currentPage = mCurrentPageSequence.get(mCurrentPageSequence.size() -1);
+                    Bundle bundle = currentPage.getData();
+                    String key = currentPage.getKey().split(":")[0];
+                    Person person = null;
+                    if ("Children".equals(key)) {
+                        // DO kid stuff
+                        person = new Children(bundle.getString(Constants.NAME_DATA_KEY), bundle.getString(Constants.EMAIL_DATA_KEY),
+                                Utils.getTokenPreference(getApplicationContext()),bundle.getString(Constants.AUTHORIZED_EMAIL_DATA_KEY));
+                        Utils.setRolePreference(getApplicationContext(), "children");
+
+                    } else {
+                        //Do adult stuff
+                        person = new Parent(bundle.getString(Constants.NAME_DATA_KEY), bundle.getString(Constants.EMAIL_DATA_KEY),
+                                Utils.getTokenPreference(getApplicationContext()), null);
+                        Utils.setRolePreference(getApplicationContext(), "parent");
+                    }
+                    DatabaseDAO.getInstance().savePerson(getApplicationContext(),person);
+                    Log.d("Leandro",bundle.toString());
+
+
+                } else {
+                    if (mEditingAfterReview) {
+                        mPager.setCurrentItem(mPagerAdapter.getCount() - 1);
+                    } else {
+                        mPager.setCurrentItem(mPager.getCurrentItem() + 1);
+                    }
+                }
+            }
+        });
+
+        mPrevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mPager.setCurrentItem(mPager.getCurrentItem() - 1);
+            }
+        });
+
+        onPageTreeChanged();
+        updateBottomBar();
     }
 
+    @Override
+    public void onPageTreeChanged() {
+        mCurrentPageSequence = mWizardModel.getCurrentPageSequence();
+        recalculateCutOffPage();
+        mStepPagerStrip.setPageCount(mCurrentPageSequence.size() + 1); // + 1 = review step
+        mPagerAdapter.notifyDataSetChanged();
+        updateBottomBar();
+    }
+
+    private void updateBottomBar() {
+        int position = mPager.getCurrentItem();
+        if (position == mCurrentPageSequence.size()) {
+            mNextButton.setText(R.string.finish);
+            mNextButton.setBackgroundResource(R.drawable.finish_background);
+            mNextButton.setTextAppearance(this, R.style.TextAppearanceFinish);
+        } else {
+            mNextButton.setText(mEditingAfterReview
+                    ? R.string.review
+                    : R.string.next);
+            mNextButton.setBackgroundResource(R.drawable.selectable_item_background);
+            TypedValue v = new TypedValue();
+            getTheme().resolveAttribute(android.R.attr.textAppearanceMedium, v, true);
+            mNextButton.setTextAppearance(this, v.resourceId);
+            mNextButton.setEnabled(position != mPagerAdapter.getCutOffPage());
+        }
+
+        mPrevButton.setVisibility(position <= 0 ? View.INVISIBLE : View.VISIBLE);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mWizardModel.unregisterListener(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBundle("model", mWizardModel.save());
+    }
+
+    @Override
+    public AbstractWizardModel onGetModel() {
+        return mWizardModel;
+    }
+
+    @Override
+    public void onEditScreenAfterReview(String key) {
+        for (int i = mCurrentPageSequence.size() - 1; i >= 0; i--) {
+            if (mCurrentPageSequence.get(i).getKey().equals(key)) {
+                mConsumePageSelectedEvent = true;
+                mEditingAfterReview = true;
+                mPager.setCurrentItem(i);
+                updateBottomBar();
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onPageDataChanged(Page page) {
+        if (page.isRequired()) {
+            if (recalculateCutOffPage()) {
+                mPagerAdapter.notifyDataSetChanged();
+                updateBottomBar();
+            }
+        }
+    }
+
+    @Override
+    public Page onGetPage(String key) {
+        return mWizardModel.findByKey(key);
+    }
+
+    private boolean recalculateCutOffPage() {
+        // Cut off the pager adapter at first required page that isn't completed
+        int cutOffPage = mCurrentPageSequence.size() + 1;
+        for (int i = 0; i < mCurrentPageSequence.size(); i++) {
+            Page page = mCurrentPageSequence.get(i);
+            if (page.isRequired() && !page.isCompleted()) {
+                cutOffPage = i;
+                break;
+            }
+        }
+
+        if (mPagerAdapter.getCutOffPage() != cutOffPage) {
+            mPagerAdapter.setCutOffPage(cutOffPage);
+            return true;
+        }
+
+        return false;
+    }
+
+    public class MyPagerAdapter extends FragmentStatePagerAdapter {
+        private int mCutOffPage;
+        private Fragment mPrimaryItem;
+
+        public MyPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            if (i >= mCurrentPageSequence.size()) {
+                return new ReviewFragment();
+            }
+
+            return mCurrentPageSequence.get(i).createFragment();
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            // TODO: be smarter about this
+            if (object == mPrimaryItem) {
+                // Re-use the current fragment (its position never changes)
+                return POSITION_UNCHANGED;
+            }
+
+            return POSITION_NONE;
+        }
+
+        @Override
+        public void setPrimaryItem(ViewGroup container, int position, Object object) {
+            super.setPrimaryItem(container, position, object);
+            mPrimaryItem = (Fragment) object;
+        }
+
+        @Override
+        public int getCount() {
+            if (mCurrentPageSequence == null) {
+                return 0;
+            }
+            return Math.min(mCutOffPage + 1, mCurrentPageSequence.size() + 1);
+        }
+
+        public void setCutOffPage(int cutOffPage) {
+            if (cutOffPage < 0) {
+                cutOffPage = Integer.MAX_VALUE;
+            }
+            mCutOffPage = cutOffPage;
+        }
+
+        public int getCutOffPage() {
+            return mCutOffPage;
+        }
+    }
 }
