@@ -44,8 +44,10 @@ import java.util.List;
 
 import lcs.fcmtest.database.DatabaseDAO;
 import lcs.fcmtest.model.Children;
+import lcs.fcmtest.model.InfoAboutInstalledApps;
 import lcs.fcmtest.model.Parent;
 import lcs.fcmtest.model.Person;
+import lcs.fcmtest.services.GetListOfInstalledApps;
 import lcs.fcmtest.utils.Constants;
 import lcs.fcmtest.utils.Utils;
 import lcs.fcmtest.wizard.models.AbstractWizardModel;
@@ -158,19 +160,42 @@ public class MainActivity extends FragmentActivity implements
                     Bundle bundle = currentPage.getData();
                     String key = currentPage.getKey().split(":")[0];
                     Person person = null;
+                    Intent intent;
                     if ("Children".equals(key)) {
                         // DO kid stuff
                         person = new Children(bundle.getString(Constants.NAME_DATA_KEY), bundle.getString(Constants.EMAIL_DATA_KEY),
                                 Utils.getTokenPreference(getApplicationContext()),bundle.getString(Constants.AUTHORIZED_EMAIL_DATA_KEY));
                         Utils.setRolePreference(getApplicationContext(), "children");
+                        intent = new Intent(getApplicationContext(),ChildrenQRCodeActivity.class);
+                        intent.putExtra(Constants.EMAIL_DATA_KEY, person.getEmail().split("@")[0]);
+
+
+
 
                     } else {
                         //Do adult stuff
                         person = new Parent(bundle.getString(Constants.NAME_DATA_KEY), bundle.getString(Constants.EMAIL_DATA_KEY),
                                 Utils.getTokenPreference(getApplicationContext()), null);
                         Utils.setRolePreference(getApplicationContext(), "parent");
+                        intent = new Intent(getApplicationContext(),ParentMainActivity.class);
                     }
+                    Utils.setUserPreference(getApplicationContext(),person.getEmail().split("@")[0]);
                     DatabaseDAO.getInstance().savePerson(getApplicationContext(),person);
+
+                    if (Utils.getRolePreference(getApplicationContext()).equals("children")) {
+                        GetListOfInstalledApps getListOfInstalledApps = new GetListOfInstalledApps(getApplicationContext(),
+                                new GetListOfInstalledApps.AsyncResponse() {
+                                    @Override
+                                    public void processFinish(List<InfoAboutInstalledApps> output) {
+                                        DatabaseDAO.getInstance().addAppList(getApplicationContext(),
+                                                Utils.getUserPreference(getApplicationContext()),
+                                                output);
+                                    }
+                                });
+                        getListOfInstalledApps.execute();
+                    }
+                    startActivity(intent);
+                    MainActivity.this.finish();
                     Log.d("Leandro",bundle.toString());
 
 

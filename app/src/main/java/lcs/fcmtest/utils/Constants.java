@@ -3,6 +3,7 @@ package lcs.fcmtest.utils;
 public class Constants {
     public static final String ROLE_PREFERENCE = "role";
     public static final String TOKEN_PREFERENCE = "token";
+    public static final String USER_PREFERENCE = "user";
     public static final String CHILDRENS_DATABASE = "childrens";
     public static final String PARENTS_DATABASE = "parents";
     public static final String NOTIFICATIONS_DATABASE = "notifications";
