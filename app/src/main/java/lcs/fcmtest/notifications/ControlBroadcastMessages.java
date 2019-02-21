@@ -28,7 +28,7 @@ public class ControlBroadcastMessages extends BroadcastReceiver {
             if (Utils.getIsServiceRunning(context)) {
                 Intent mIntent = new Intent(context, BackgroundAppMonitorService.class);
                 mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startService(mIntent);
+                context.startForegroundService(mIntent);
             }
         }
 

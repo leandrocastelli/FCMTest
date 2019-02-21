@@ -120,4 +120,17 @@ public class MessageHandler {
         }
 
     }
+
+    public void askPermissionFatherApp(Context context, String packageName, String appName) {
+            String name = Utils.getNamePreference(context);
+            String userName = Utils.getEmailPreference(context).split("@")[0];
+            String parentId = Utils.getParentPreference(context);
+            String message = String.format(Constants.JSON_DATA, userName, name, packageName, appName, parentId);
+        try {
+            JSONObject object = new JSONObject(message);
+            sendMessage(context, object);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }

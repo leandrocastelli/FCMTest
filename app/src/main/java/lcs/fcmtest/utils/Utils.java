@@ -61,4 +61,45 @@ public class Utils {
         sharedPreferences.apply();
 
     }
+
+    public static String getParentPreference(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getString(Constants.PARENT_PREFERENCE, "");
+    }
+
+    public static void setParentPreference(Context context, String value) {
+        SharedPreferences.Editor sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+                .edit();
+        sharedPreferences.putString(Constants.PARENT_PREFERENCE, value);
+        sharedPreferences.apply();
+
+    }
+
+    public static String getNamePreference(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getString(Constants.NAME_DATA_KEY, "");
+    }
+
+    public static void setNamePreference(Context context, String value) {
+        SharedPreferences.Editor sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+                .edit();
+        sharedPreferences.putString(Constants.NAME_DATA_KEY, value);
+        sharedPreferences.apply();
+
+    }
+
+    public static String getEmailPreference(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getString(Constants.EMAIL_DATA_KEY, "");
+    }
+
+    public static void setEmailPreference(Context context, String value) {
+        SharedPreferences.Editor sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+                .edit();
+        sharedPreferences.putString(Constants.EMAIL_DATA_KEY, value);
+        sharedPreferences.apply();
+
+    }
+
+
 }

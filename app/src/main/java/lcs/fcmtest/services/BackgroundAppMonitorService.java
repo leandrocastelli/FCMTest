@@ -40,6 +40,7 @@ public class BackgroundAppMonitorService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         destroyService = false;
+        Log.d("Leandro", "Starting service onStartCommand");
         IntentFilter filter = new IntentFilter(Intent.ACTION_BOOT_COMPLETED);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         mReceiver = new ControlBroadcastMessages();
@@ -74,7 +75,7 @@ public class BackgroundAppMonitorService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        task.cancel(true);
+       task.cancel(true);
         try {
             if (mReceiver != null)
                 unregisterReceiver(mReceiver);
@@ -82,6 +83,7 @@ public class BackgroundAppMonitorService extends Service {
             e.printStackTrace();
         }
         if (destroyService) {
+            Log.d("Leandro", "onDestroy BackgroundAppMonitorService");
             stopSelf();
             Utils.setIsServiceRunning(context, false);
         } else {
@@ -97,7 +99,7 @@ public class BackgroundAppMonitorService extends Service {
         task.cancel(true);
         if (mReceiver != null)
             unregisterReceiver(mReceiver);
-
+        Log.d("Leandro", "onTaskRemoved BackgroundAppMonitorService");
         newStartServiceMethod();
     }
 

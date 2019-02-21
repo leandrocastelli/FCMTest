@@ -161,6 +161,7 @@ public class MainActivityWizard extends FragmentActivity implements
                     String key = currentPage.getKey().split(":")[0];
                     Person person = null;
                     Intent intent;
+                    Utils.setNamePreference(getApplicationContext(), bundle.getString(Constants.NAME_DATA_KEY));
                     if ("Children".equals(key)) {
                         // DO kid stuff
                         person = new Children(bundle.getString(Constants.NAME_DATA_KEY), bundle.getString(Constants.EMAIL_DATA_KEY),
@@ -168,9 +169,6 @@ public class MainActivityWizard extends FragmentActivity implements
                         Utils.setRolePreference(getApplicationContext(), "children");
                         intent = new Intent(getApplicationContext(),ChildrenQRCodeActivity.class);
                         intent.putExtra(Constants.EMAIL_DATA_KEY, person.getEmail().split("@")[0]);
-
-
-
 
                     } else {
                         //Do adult stuff

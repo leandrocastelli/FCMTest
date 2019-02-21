@@ -18,8 +18,11 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
 import lcs.fcmtest.services.BackgroundAppMonitorService;
+import lcs.fcmtest.utils.AcessControl;
 import lcs.fcmtest.utils.Constants;
 import lcs.fcmtest.utils.Utils;
+
+import static lcs.fcmtest.services.BackgroundAppMonitorService.controlAcess;
 
 public class ChildrenQRCodeActivity extends AppCompatActivity {
 
@@ -35,8 +38,9 @@ public class ChildrenQRCodeActivity extends AppCompatActivity {
         askForPermition();
         boolean isServiceRunning = Utils.getIsServiceRunning(this);
 
+        controlAcess.changeFlagValue(true);
+        startLockService(true,getApplicationContext());
 
-        startLockService(true, this);
         QRCodeImg = (ImageView) findViewById(R.id.QRCode);
         generateQRCode();
 

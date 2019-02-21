@@ -12,12 +12,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 import lcs.fcmtest.LockActivity;
 import lcs.fcmtest.model.Children;
 import lcs.fcmtest.model.InfoAboutInstalledApps;
 import lcs.fcmtest.model.Person;
+import lcs.fcmtest.notifications.MessageHandler;
 import lcs.fcmtest.utils.Constants;
 import lcs.fcmtest.utils.Utils;
 
@@ -79,13 +83,33 @@ public class DatabaseDAO {
 
     }
 
-    public void linkParentChild(Context context, String parent, String child) {
+    public void linkParentChild(final Context context, final String parent, final String child) {
         FirebaseApp.initializeApp(context);
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         database.getReference(Constants.PARENTS_DATABASE +
                 "/" + parent + "/childrens/" + child).setValue(true);
-        database.getReference(Constants.CHILDRENS_DATABASE +
-                "/" + child + "/parents/" + parent).setValue(true);
+        final DatabaseReference childRef =database.getReference(Constants.CHILDRENS_DATABASE +
+                        "/" + child );
+        childRef.child("parents").child(parent).setValue(true);
+        childRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String id = dataSnapshot.child("id").getValue(String.class);
+                MessageHandler messageHandler = new MessageHandler();
+                String jsonString = String.format(Constants.JSON_SETUP_CONCLUDED, parent,"true",id);
+                try {
+                    messageHandler.sendMessage(context, new JSONObject(jsonString));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                childRef.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void addAppList(Context context, String id, List<InfoAboutInstalledApps> list) {
@@ -107,17 +131,22 @@ public class DatabaseDAO {
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.hasChild("status"))
+                    return;
                 InfoAboutInstalledApps value = dataSnapshot.getValue(InfoAboutInstalledApps.class);
                 if ("blocked".equals(value.getStatus())) {
                     //App is blocked, let's check the ask again flag
                     //TODO create flag
-                    Intent it = new Intent(context, LockActivity.class);
-                    it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    Intent it = new Intent(context.getApplicationContext(), LockActivity.class);
+                    it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK );
                     it.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                     it.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                    context.startActivity(it);
+                    it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.getApplicationContext().startActivity(it);
+                    new MessageHandler().askPermissionFatherApp(context, value.getPname(), value.getAppname());
 
                 }
+                reference.removeEventListener(this);
 
             }
 
@@ -126,6 +155,26 @@ public class DatabaseDAO {
 
             }
         });
+    }
+
+    public void getParentId(final Context context, final String parentUser) {
+        FirebaseApp.initializeApp(context);
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference reference = database.getReference(Constants.PARENTS_DATABASE).child(parentUser).child("id");
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String parentId = dataSnapshot.getValue(String.class);
+                Utils.setParentPreference(context, parentId);
+                reference.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
 }
