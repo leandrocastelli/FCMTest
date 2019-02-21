@@ -41,7 +41,7 @@ public class MainGetStarted extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_torneio_mar2018);
+        setContentView(R.layout.activity_get_started);
 
         mSectionsPageAdapter = new SectionsPageAdapter(getSupportFragmentManager()); //tabs
 
