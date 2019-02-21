@@ -24,7 +24,6 @@ public class AnswerReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Toast.makeText(context,"I am ALiveeeeee",Toast.LENGTH_SHORT).show();
         Bundle bundle = intent.getExtras();
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.cancel(123);

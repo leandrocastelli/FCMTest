@@ -162,6 +162,7 @@ public class MainActivityWizard extends FragmentActivity implements
                     Person person = null;
                     Intent intent;
                     Utils.setNamePreference(getApplicationContext(), bundle.getString(Constants.NAME_DATA_KEY));
+                    Utils.setEmailPreference(getApplicationContext(), bundle.getString(Constants.EMAIL_DATA_KEY));
                     if ("Children".equals(key)) {
                         // DO kid stuff
                         person = new Children(bundle.getString(Constants.NAME_DATA_KEY), bundle.getString(Constants.EMAIL_DATA_KEY),

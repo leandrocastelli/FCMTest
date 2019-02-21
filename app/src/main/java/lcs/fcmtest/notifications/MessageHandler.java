@@ -133,4 +133,15 @@ public class MessageHandler {
             e.printStackTrace();
         }
     }
+
+    public void answerBlockApp(Context context, String appName, String status, String childrenId) {
+        String title = "You father answered!";
+        String body = "Your app " + appName + " was " +status;
+        String message = String.format(Constants.JSON_NOTIFICATION, body, title,childrenId);
+        try {
+            sendMessage(context, new JSONObject(message));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }

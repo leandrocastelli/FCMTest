@@ -30,12 +30,12 @@ public class NotificationHandler {
         Intent intentOK = new Intent(context, AnswerReceiver.class);
         Intent intentCancel = new Intent(context, AnswerReceiver.class);
 
-        intentOK.putExtra("answer","allow");
+        intentOK.putExtra("answer","allowed");
         intentOK.putExtra("appName",appName);
         intentOK.putExtra("packageName",packageName);
         intentOK.putExtra("sender_id",sender_id);
 
-        intentCancel.putExtra("answer","block");
+        intentCancel.putExtra("answer","blocked");
         intentCancel.putExtra("appName",appName);
         intentCancel.putExtra("packageName",packageName);
         intentCancel.putExtra("sender_id",sender_id);
