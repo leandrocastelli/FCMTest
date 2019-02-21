@@ -23,7 +23,9 @@
     android:paddingLeft="?android:listPreferredItemPaddingLeft"
     android:paddingRight="?android:listPreferredItemPaddingRight"
     android:paddingTop="12dp"
-    android:paddingBottom="12dp">
+    android:paddingBottom="12dp"
+    android:background="#E3E3E3"
+    >
 
     <TextView android:id="@android:id/text1"
         style="?android:textAppearanceSmall"

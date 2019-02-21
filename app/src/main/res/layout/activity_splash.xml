@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E3E3E3"
-    tools:context=".ChildrenQRCodeActivity">
+    android:background="#CCCCFF"
+    tools:context=".SplashActivity">
 
-    <ImageView
-        android:id="@+id/QRCode"
-        android:layout_width="279dp"
-        android:layout_height="297dp"
+    <pl.droidsonroids.gif.GifImageView
+        android:layout_width="250dp"
+        android:layout_height="250dp"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        tools:ignore="MissingConstraints" />
+        android:src="@drawable/remotegif"
+        android:scaleType="fitXY"/>
 
 </RelativeLayout>

@@ -58,7 +58,7 @@ import lcs.fcmtest.wizard.ui.PageFragmentCallbacks;
 import lcs.fcmtest.wizard.ui.ReviewFragment;
 import lcs.fcmtest.wizard.ui.StepPagerStrip;
 
-public class MainActivity extends FragmentActivity implements
+public class MainActivityWizard extends FragmentActivity implements
         PageFragmentCallbacks,
         ReviewFragment.Callbacks,
         ModelCallbacks {
@@ -195,7 +195,7 @@ public class MainActivity extends FragmentActivity implements
                         getListOfInstalledApps.execute();
                     }
                     startActivity(intent);
-                    MainActivity.this.finish();
+                    MainActivityWizard.this.finish();
                     Log.d("Leandro",bundle.toString());
 
 
