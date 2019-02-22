@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#CCCCFF</color>
-    <color name="colorPrimaryDark">#00A09B</color>
-    <color name="colorAccent">#6bceff</color>
+    <color name="colorPrimaryDark">#209de4</color>
+    <color name="colorAccent">#ffffff</color>
 
     <color name="step_pager_previous_tab_color">#4433b5e5</color>
-    <color name="step_pager_selected_tab_color">#209de4</color>
-    <color name="step_pager_selected_last_tab_color">#ff669900</color>
+    <color name="step_pager_selected_tab_color">#6bceff</color>
+    <color name="step_pager_selected_last_tab_color">#6bceff</color>
     <color name="step_pager_next_tab_color">#10000000</color>
 
-    <color name="review_green">#ff669900</color>
+    <color name="review_green">#209de4</color>
 
     <color name="text_light">#66000000</color>
 </resources>
