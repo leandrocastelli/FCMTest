@@ -15,10 +15,13 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lcs.fcmtest.ChildrenQRCodeActivity;
 import lcs.fcmtest.LockActivity;
+import lcs.fcmtest.adapter.IDataReady;
 import lcs.fcmtest.model.Children;
 import lcs.fcmtest.model.InfoAboutInstalledApps;
 import lcs.fcmtest.model.Person;
@@ -84,11 +87,11 @@ public class DatabaseDAO {
 
     }
 
-    public void linkParentChild(final Context context, final String parent, final String child) {
+    public void linkParentChild(final Context context, final String parent, final String child, final String childName) {
         FirebaseApp.initializeApp(context);
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         database.getReference(Constants.PARENTS_DATABASE +
-                "/" + parent + "/childrens/" + child).setValue(true);
+                "/" + parent + "/childrens/" + child).setValue(childName);
         final DatabaseReference childRef =database.getReference(Constants.CHILDRENS_DATABASE +
                         "/" + child );
         childRef.child("parents").child(parent).setValue(true);
@@ -168,6 +171,32 @@ public class DatabaseDAO {
                 String parentId = dataSnapshot.getValue(String.class);
                 Utils.setParentPreference(context, parentId);
                 ChildrenQRCodeActivity.refreshActivity();
+                reference.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public void readChildren(final Context context, final IDataReady adapter) {
+        FirebaseApp.initializeApp(context);
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference reference = database.getReference(Constants.PARENTS_DATABASE).child(Utils.getUserPreference(context))
+                .child("childrens");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Map<String,String> map = new HashMap<String,String>();
+                for (DataSnapshot children : dataSnapshot.getChildren()) {
+                    String user = children.getKey();
+                    String name = children.getValue(String.class);
+                    map.put(user,name);
+                }
+                adapter.dataSync(map);
                 reference.removeEventListener(this);
             }
 

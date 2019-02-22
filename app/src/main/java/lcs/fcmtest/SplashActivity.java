@@ -29,6 +29,7 @@ public class SplashActivity extends AppCompatActivity {
                 mainIntent = new Intent(this, ChildrenQRCodeActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString(Constants.EMAIL_DATA_KEY, Utils.getEmailPreference(this).split("@")[0]);
+                bundle.putString(Constants.NAME_DATA_KEY, Utils.getNamePreference(this));
                 mainIntent.putExtras(bundle);
             }break;
             default: {

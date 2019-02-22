@@ -170,6 +170,7 @@ public class MainActivityWizard extends FragmentActivity implements
                         Utils.setRolePreference(getApplicationContext(), "children");
                         intent = new Intent(getApplicationContext(),ChildrenQRCodeActivity.class);
                         intent.putExtra(Constants.EMAIL_DATA_KEY, person.getEmail().split("@")[0]);
+                        intent.putExtra(Constants.NAME_DATA_KEY, person.getName());
 
                     } else {
                         //Do adult stuff

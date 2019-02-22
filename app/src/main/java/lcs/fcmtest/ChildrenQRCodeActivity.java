@@ -35,7 +35,7 @@ public class ChildrenQRCodeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         instance = this;
         Bundle bundle = getIntent().getExtras();
-        BD_QRCode = bundle.getString(Constants.EMAIL_DATA_KEY);
+        BD_QRCode = bundle.getString(Constants.EMAIL_DATA_KEY) + ":::" + bundle.get(Constants.NAME_DATA_KEY);
         if ("".equals(Utils.getParentPreference(this))) {
             setContentView(R.layout.activity_children_qrcode);
             QRCodeImg = (ImageView) findViewById(R.id.QRCode);

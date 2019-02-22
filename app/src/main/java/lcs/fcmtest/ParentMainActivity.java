@@ -5,10 +5,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
+import lcs.fcmtest.adapter.ChildrenAdapter;
+import lcs.fcmtest.adapter.IDataReady;
 import lcs.fcmtest.database.DatabaseDAO;
 import lcs.fcmtest.utils.Utils;
 
@@ -20,6 +24,7 @@ public class ParentMainActivity extends AppCompatActivity {
 
     private static final int RC_BARCODE_CAPTURE = 9001;
     private static final String TAG = "BarcodeMain";
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +32,10 @@ public class ParentMainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_parent_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        recyclerView = (RecyclerView)findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(new ChildrenAdapter());
+        DatabaseDAO.getInstance().readChildren(this, (IDataReady)recyclerView.getAdapter());
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.read_barcode);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,6 +64,13 @@ public class ParentMainActivity extends AppCompatActivity {
 
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        recyclerView.getAdapter().notifyDataSetChanged();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -63,8 +78,11 @@ public class ParentMainActivity extends AppCompatActivity {
 
             if (resultCode == RESULT_OK) {
                 String contents = data.getStringExtra("SCAN_RESULT");
+                String child[] = contents.split(":::");
                 DatabaseDAO.getInstance().linkParentChild(this, Utils.getUserPreference(this),
-                        contents);
+                        child[0],child[1]);
+
+                DatabaseDAO.getInstance().readChildren(this, (IDataReady)recyclerView.getAdapter());
             }
             if(resultCode == RESULT_CANCELED){
                 //handle cancel
