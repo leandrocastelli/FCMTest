@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import lcs.fcmtest.ChildrenQRCodeActivity;
 import lcs.fcmtest.LockActivity;
 import lcs.fcmtest.model.Children;
 import lcs.fcmtest.model.InfoAboutInstalledApps;
@@ -166,6 +167,7 @@ public class DatabaseDAO {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String parentId = dataSnapshot.getValue(String.class);
                 Utils.setParentPreference(context, parentId);
+                ChildrenQRCodeActivity.refreshActivity();
                 reference.removeEventListener(this);
             }
 

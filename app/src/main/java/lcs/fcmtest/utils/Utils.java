@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import java.util.Properties;
+
 public class Utils {
 
     public static String getRolePreference(Context context) {
@@ -99,6 +101,12 @@ public class Utils {
         sharedPreferences.putString(Constants.EMAIL_DATA_KEY, value);
         sharedPreferences.apply();
 
+    }
+
+    public static boolean isMoto() {
+        Properties sysProps = System.getProperties();
+        String userAgent = sysProps.getProperty("http.agent","");
+        return  userAgent.contains("moto");
     }
 
 
