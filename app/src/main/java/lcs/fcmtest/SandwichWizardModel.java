@@ -54,8 +54,8 @@ public class SandwichWizardModel extends AbstractWizardModel {
         } else {
             return new PageList(
                     new BranchPage(this, "Credential:")
-                            .addBranch("Children",
-                                    new ChildrenInfoPage(this, "Your info")
+                            .addBranch("Parent",
+                                    new ParentInfoPage(this, "Your info")
                                             .setRequired(true)
                             )
             );
