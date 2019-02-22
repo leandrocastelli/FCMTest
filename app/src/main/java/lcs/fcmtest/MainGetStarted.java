@@ -29,6 +29,10 @@ public class MainGetStarted extends AppCompatActivity
     Tab1Fragment t1 = new Tab1Fragment();
     Tab2Fragment t2 = new Tab2Fragment();
     Tab3Fragment t3 = new Tab3Fragment();
+    Tab4Fragment t4 = new Tab4Fragment();
+    Tab5Fragment t5 = new Tab5Fragment();
+    Tab6Fragment t6 = new Tab6Fragment();
+
 
 
     int idx=0;
@@ -68,16 +72,20 @@ public class MainGetStarted extends AppCompatActivity
         public void onClick(View v) {
 
         idx++;
-        if(idx>2)
+        if(idx>5)
             idx=0;
 
 
 
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
-        adapter.addFragment(t1, "Tabela e Resultados");
-        adapter.addFragment(t2, "Escalações");
-        adapter.addFragment(t3, "LIVE");
-        mViewPager.setAdapter(adapter);
+        adapter.addFragment(t1, "Welcome");
+        adapter.addFragment(t2, "tela 1");
+        adapter.addFragment(t3, "tela 2");
+        adapter.addFragment(t4, "tela 3");
+        adapter.addFragment(t5, "tela 4");
+        adapter.addFragment(t6, "Thank you");
+
+            mViewPager.setAdapter(adapter);
 
 
     }
@@ -87,9 +95,12 @@ public class MainGetStarted extends AppCompatActivity
 
 
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
-        adapter.addFragment(t1, "Tabela e Resultados");
-        adapter.addFragment(t2, "Escalações");
-        adapter.addFragment(t3, "LIVE");
+        adapter.addFragment(t1, "Welcome");
+        adapter.addFragment(t2, "tela 1");
+        adapter.addFragment(t3, "tela 2");
+        adapter.addFragment(t4, "tela 3");
+        adapter.addFragment(t5, "tela 4");
+        adapter.addFragment(t6, "Thank you");
         viewPager.setAdapter(adapter);
 
     }
