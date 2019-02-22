@@ -28,21 +28,29 @@ public class ChildrenQRCodeActivity extends AppCompatActivity {
 
     ImageView QRCodeImg;
     String BD_QRCode;
+    public static ChildrenQRCodeActivity instance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        instance = this;
         Bundle bundle = getIntent().getExtras();
         BD_QRCode = bundle.getString(Constants.EMAIL_DATA_KEY);
-        setContentView(R.layout.activity_children_qrcode);
+        if ("".equals(Utils.getParentPreference(this))) {
+            setContentView(R.layout.activity_children_qrcode);
+            QRCodeImg = (ImageView) findViewById(R.id.QRCode);
+            generateQRCode();
+        }
+        else {
+            setContentView(R.layout.activity_after_qr_code);
+        }
         askForPermition();
         boolean isServiceRunning = Utils.getIsServiceRunning(this);
 
         controlAcess.changeFlagValue(true);
         startLockService(true,getApplicationContext());
 
-        QRCodeImg = (ImageView) findViewById(R.id.QRCode);
-        generateQRCode();
+
 
 
     }
@@ -96,5 +104,11 @@ public class ChildrenQRCodeActivity extends AppCompatActivity {
 
         }
 
+    }
+    public static void refreshActivity() {
+        if (instance != null) {
+            instance.finish();
+            instance.startActivity(instance.getIntent());
+        }
     }
 }

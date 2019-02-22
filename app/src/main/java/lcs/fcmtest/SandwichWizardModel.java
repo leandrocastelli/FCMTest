@@ -18,6 +18,7 @@ package lcs.fcmtest;
 
 import android.content.Context;
 
+import lcs.fcmtest.utils.Utils;
 import lcs.fcmtest.wizard.models.AbstractWizardModel;
 import lcs.fcmtest.wizard.models.BranchPage;
 import lcs.fcmtest.wizard.models.ChildrenInfoPage;
@@ -32,22 +33,33 @@ public class SandwichWizardModel extends AbstractWizardModel {
 
     @Override
     protected PageList onNewRootPageList() {
-        return new PageList(
-                new BranchPage(this, "Credential:")
-                        .addBranch("Children",
-                                new ChildrenInfoPage(this, "Your info")
-                                        .setRequired(true)
-                        )
+        if (Utils.isMoto()) {
+            return new PageList(
+                    new BranchPage(this, "Credential:")
+                            .addBranch("Children",
+                                    new ChildrenInfoPage(this, "Your info")
+                                            .setRequired(true)
+                            )
 
-                        .addBranch("Parent",
-                               new ParentInfoPage(this, "Your info")
-                                        .setRequired(true)
+                            .addBranch("Parent",
+                                    new ParentInfoPage(this, "Your info")
+                                            .setRequired(true)
 
-                        )
+                            )
 
-                        .setRequired(true)
+                            .setRequired(true)
 
 
-        );
+            );
+        } else {
+            return new PageList(
+                    new BranchPage(this, "Credential:")
+                            .addBranch("Children",
+                                    new ChildrenInfoPage(this, "Your info")
+                                            .setRequired(true)
+                            )
+            );
+        }
     }
+
 }

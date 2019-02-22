@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
+import lcs.fcmtest.utils.Constants;
+import lcs.fcmtest.utils.Utils;
+
 public class SplashActivity extends AppCompatActivity {
 
     /** Duration of wait **/
@@ -16,15 +19,30 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(icicle);
 
         setContentView(R.layout.activity_splash);
+        String role = Utils.getRolePreference(this);
+        final Intent mainIntent;
+        switch (role) {
+            case "parent": {
+                mainIntent = new Intent(this, ParentMainActivity.class);
+            } break;
+            case "children": {
+                mainIntent = new Intent(this, ChildrenQRCodeActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString(Constants.EMAIL_DATA_KEY, Utils.getEmailPreference(this).split("@")[0]);
+                mainIntent.putExtras(bundle);
+            }break;
+            default: {
+                mainIntent = new Intent(this, MainGetStarted.class);
+            }
 
+        }
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-
-                Intent mainIntent = new Intent(SplashActivity.this, MainGetStarted.class);
                 startActivity(mainIntent);
                 finish();
             }
         }, SPLASH_DISPLAY_LENGTH);
+
     }
 }
