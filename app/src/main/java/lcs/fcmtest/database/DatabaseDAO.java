@@ -57,7 +57,7 @@ public class DatabaseDAO {
 
     }
 
-    public void saveAnswer(Context context, final Bundle bundle) {
+    public void saveAnswer(final Context context, final Bundle bundle) {
         FirebaseApp.initializeApp(context);
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference appRef = database.getReference(Constants.CHILDRENS_DATABASE +
@@ -69,9 +69,9 @@ public class DatabaseDAO {
                 final DatabaseReference ref = database.getReference(Constants.CHILDRENS_DATABASE +
                         "/" + bundle.get("sender_id") + "/appList/"
                         + Utils.convertPackageNameToPath(bundle.getString("packageName"))
-                        + "status");
+                        + "/status");
                 ref.setValue(bundle.getString("answer"));
-
+                new MessageHandler().answerBlockApp(context, bundle.getString("appName"),bundle.getString("answer"),fcmId);
 
             }
 
